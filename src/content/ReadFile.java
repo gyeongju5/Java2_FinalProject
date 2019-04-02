@@ -33,8 +33,6 @@ public class ReadFile {
                 orderList.add(order);
                 line = br.readLine();
             }
-            
-
     }
 
 }

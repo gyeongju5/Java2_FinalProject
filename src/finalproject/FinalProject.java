@@ -27,6 +27,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.scene.input.KeyCode;
 
 public class FinalProject extends Application {
 
@@ -66,7 +67,34 @@ public class FinalProject extends Application {
         btnUpdate.setOnAction(new update());
         btnDelete.setOnAction(new delete());
 
+        txtPrice.setOnKeyPressed(ee -> {
+
+        });
+
+        txtPrice.setOnKeyReleased(ee -> {
+            if (!isNumeric(ee.getCode())) {
+                txtPrice.selectBackward();
+                Alert dlgError = new Alert(Alert.AlertType.ERROR);
+                dlgError.setContentText("Only Numbers Allowed");
+                dlgError.show();
+            }
+        });
+        
+        txtQuantity.setOnKeyPressed(ee -> {
+
+        });
+
+        txtQuantity.setOnKeyReleased(ee -> {
+            if (!isNumeric(ee.getCode())) {
+                txtPrice.selectBackward();
+                Alert dlgError = new Alert(Alert.AlertType.ERROR);
+                dlgError.setContentText("Only Numbers Allowed");
+                dlgError.show();
+            }
+        });
+
         primaryStage.setOnShowing(new startProgram());
+        primaryStage.setOnCloseRequest(new EndProgram());.
 //        Scene scene = new Scene(root, 300, 250);
         primaryStage.setTitle("Final Project");
         primaryStage.setScene(getScene());
@@ -123,6 +151,8 @@ public class FinalProject extends Application {
             txtPrice.setText(null);
             txtQuantity.setText(null);
             txtOrderID.requestFocus();
+
+            sub = orderList.size();
         }
     }
 
@@ -172,7 +202,8 @@ public class FinalProject extends Application {
 
         @Override
         public void handle(ActionEvent e) {
-            showData(0);
+            sub = 0;
+            showData(sub);
         }
     }
 
@@ -180,7 +211,8 @@ public class FinalProject extends Application {
 
         @Override
         public void handle(ActionEvent e) {
-            showData(orderList.size() - 1);
+            sub = orderList.size() - 1;
+            showData(sub);
         }
     }
 
@@ -196,6 +228,13 @@ public class FinalProject extends Application {
 
             if (result.get() == ButtonType.OK) {
                 message = "Confirm Clicked";
+                dlgMessage.setContentText(message);
+                dlgMessage.show();
+                if (sub == orderList.size()) {
+                    Order one = new Order(txtOrderID.getText());
+                    orderList.add(one);
+                }
+
                 orderList.get(sub).setID(txtOrderID.getText());
                 orderList.get(sub).setName(txtName.getText());
                 orderList.get(sub).setAddress(txtAddress.getText());
@@ -203,9 +242,6 @@ public class FinalProject extends Application {
                 orderList.get(sub).setProduct(txtProduct.getText());
                 orderList.get(sub).setPrice(Double.parseDouble(txtPrice.getText()));
                 orderList.get(sub).setQuantity(Integer.parseInt(txtQuantity.getText()));
-
-                dlgMessage.setContentText(message);
-                dlgMessage.show();
             } else {
                 message = "Cancel Clicked";
                 dlgMessage.setContentText(message);
@@ -238,4 +274,20 @@ public class FinalProject extends Application {
         }
     }
 
+    private boolean isNumeric(KeyCode code) {
+        switch (code) {
+            case DIGIT0:
+            case DIGIT1:
+            case DIGIT2:
+            case DIGIT3:
+            case DIGIT4:
+            case DIGIT5:
+            case DIGIT6:
+            case DIGIT7:
+            case DIGIT8:
+            case DIGIT9:
+                return true;
+        }
+        return false;
+    }
 }
