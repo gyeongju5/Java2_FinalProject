@@ -10,6 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
@@ -17,7 +18,9 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -61,6 +64,7 @@ public class FinalProject extends Application {
         btnLast.setOnAction(new showLast());
         btnNew.setOnAction(new addNew());
         btnUpdate.setOnAction(new update());
+        btnDelete.setOnAction(new delete());
 
         primaryStage.setOnShowing(new startProgram());
 //        Scene scene = new Scene(root, 300, 250);
@@ -130,7 +134,7 @@ public class FinalProject extends Application {
                 ReadFile.loadFile("orders.dat", orderList);
                 showData(sub);
             } catch (IOException ex) {
-                
+
             }
         }
     }
@@ -179,12 +183,58 @@ public class FinalProject extends Application {
             showData(orderList.size() - 1);
         }
     }
-    
-     public class update implements EventHandler<ActionEvent> {
+
+    public class update implements EventHandler<ActionEvent> {
 
         @Override
         public void handle(ActionEvent e) {
-            
+            Alert dlgConfirmation = new Alert(AlertType.CONFIRMATION);
+            dlgConfirmation.setContentText("Do you want to UPDATE?");
+            Optional<ButtonType> result = dlgConfirmation.showAndWait();
+            String message = new String();
+            Alert dlgMessage = new Alert(AlertType.INFORMATION);
+
+            if (result.get() == ButtonType.OK) {
+                message = "Confirm Clicked";
+                orderList.get(sub).setID(txtOrderID.getText());
+                orderList.get(sub).setName(txtName.getText());
+                orderList.get(sub).setAddress(txtAddress.getText());
+                orderList.get(sub).setCity(txtCity.getText());
+                orderList.get(sub).setProduct(txtProduct.getText());
+                orderList.get(sub).setPrice(Double.parseDouble(txtPrice.getText()));
+                orderList.get(sub).setQuantity(Integer.parseInt(txtQuantity.getText()));
+
+                dlgMessage.setContentText(message);
+                dlgMessage.show();
+            } else {
+                message = "Cancel Clicked";
+                dlgMessage.setContentText(message);
+                dlgMessage.show();
+            }
+        }
+    }
+
+    public class delete implements EventHandler<ActionEvent> {
+
+        @Override
+        public void handle(ActionEvent e) {
+            Alert dlgConfirmation = new Alert(AlertType.CONFIRMATION);
+            dlgConfirmation.setContentText("Do you want to delete this element?");
+            Optional<ButtonType> result = dlgConfirmation.showAndWait();
+            String message = new String();
+            Alert dlgMessage = new Alert(AlertType.INFORMATION);
+
+            if (result.get() == ButtonType.OK) {
+                message = "Confirm Clicked";
+                dlgMessage.setContentText(message);
+                dlgMessage.show();
+                orderList.remove(sub);
+                showData(sub);
+            } else {
+                message = "Cancel Clicked";
+                dlgMessage.setContentText(message);
+                dlgMessage.show();
+            }
         }
     }
 

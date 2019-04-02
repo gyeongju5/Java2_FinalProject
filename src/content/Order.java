@@ -17,6 +17,10 @@ public class Order {
     public String getID() {
         return this.orderID;
     }
+    
+    public void setID(String orderID) {
+        this.orderID = orderID;
+    }
 
     public String getName() {
         return name;
