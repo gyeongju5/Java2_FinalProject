@@ -9,6 +9,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -22,17 +23,21 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.VBox;
 
 public class FinalProject extends Application {
 
     private LinkedList<Order> orderList = new LinkedList();
     private int sub = 0;
+    private int searchSub = 0;
     private Label lblOrderID = new Label("Order ID: ");
     private TextField txtOrderID = new TextField();
     private Label lblName = new Label("Name: ");
@@ -54,7 +59,13 @@ public class FinalProject extends Application {
     private Button btnNew = new Button("New");
     private Button btnUpdate = new Button("Update");
     private Button btnDelete = new Button("Delete");
-    private Button btnSearch = new Button("Search");
+    private Button btnSearch = new Button("Search By ");
+    private RadioButton radID = new RadioButton("ID");
+    private RadioButton radName = new RadioButton("Name");
+    private RadioButton radCity = new RadioButton("City");
+    private Label notice = new Label();
+    private TextField txtSearch = new TextField();
+    private Iterator iOrder = orderList.iterator();
 
     @Override
     public void start(Stage primaryStage) throws IOException {
@@ -66,6 +77,7 @@ public class FinalProject extends Application {
         btnNew.setOnAction(new addNew());
         btnUpdate.setOnAction(new update());
         btnDelete.setOnAction(new delete());
+        btnSearch.setOnAction(new search());
 
         txtPrice.setOnKeyPressed(ee -> {
 
@@ -79,7 +91,7 @@ public class FinalProject extends Application {
                 dlgError.show();
             }
         });
-        
+
         txtQuantity.setOnKeyPressed(ee -> {
 
         });
@@ -94,7 +106,7 @@ public class FinalProject extends Application {
         });
 
         primaryStage.setOnShowing(new startProgram());
-        primaryStage.setOnCloseRequest(new EndProgram());.
+        primaryStage.setOnCloseRequest(new EndProgram());
 //        Scene scene = new Scene(root, 300, 250);
         primaryStage.setTitle("Final Project");
         primaryStage.setScene(getScene());
@@ -109,6 +121,13 @@ public class FinalProject extends Application {
     private Scene getScene() {
 
         GridPane pane = new GridPane();
+
+        ToggleGroup group = new ToggleGroup();
+        radID.setToggleGroup(group);
+        radName.setToggleGroup(group);
+        radCity.setToggleGroup(group);
+        VBox radSearch = new VBox(radID, radName, radCity);
+
         pane.add(lblOrderID, 0, 0);
         pane.add(txtOrderID, 1, 0);
         pane.add(lblName, 2, 0);
@@ -131,8 +150,12 @@ public class FinalProject extends Application {
         pane.add(btnUpdate, 1, 3);
         pane.add(btnDelete, 2, 3);
         pane.add(btnSearch, 0, 4);
+        pane.add(radSearch, 1, 4);
+        pane.add(txtSearch, 2, 4);
+        pane.add(notice, 0, 5);
         pane.setHgap(10);
         pane.setVgap(10);
+        radID.setSelected(true);
 
         Scene scene = new Scene(pane, 1000, 300);
 
@@ -265,12 +288,64 @@ public class FinalProject extends Application {
                 dlgMessage.setContentText(message);
                 dlgMessage.show();
                 orderList.remove(sub);
+                sub = (sub >= orderList.size()) ? orderList.size() - 1 : sub;
                 showData(sub);
             } else {
                 message = "Cancel Clicked";
                 dlgMessage.setContentText(message);
                 dlgMessage.show();
             }
+        }
+    }
+
+    public class EndProgram implements EventHandler<WindowEvent> {
+
+        @Override
+        public void handle(WindowEvent e) {
+            try {
+                ReadFile.saveFile("orders.dat", orderList);
+            } catch (IOException ex) {
+                Alert dlgError = new Alert(Alert.AlertType.ERROR);
+                dlgError.setHeaderText("Data not saved");
+                dlgError.setContentText(ex.toString());
+                dlgError.show();
+            }
+
+            Alert dlgInfomation = new Alert(Alert.AlertType.INFORMATION);
+            dlgInfomation.setContentText("Data Saved - Program Ending");
+            dlgInfomation.show();
+        }
+    }
+
+    public class search implements EventHandler<ActionEvent> {
+
+        @Override
+        public void handle(ActionEvent e) {
+            if (radID.isSelected()) {
+                for (int i = 0; i < orderList.size(); i++) {
+                    if (orderList.get(i).getID().equalsIgnoreCase(txtSearch.getText())) {
+                        searchSub = i;
+                    }
+                }
+            }
+            
+            if (radName.isSelected()) {
+                for (int i = 0; i < orderList.size(); i++) {
+                    if (orderList.get(i).getName().equalsIgnoreCase(txtSearch.getText())) {
+                        searchSub = i;
+                    }
+                }
+            }
+            
+            if (radCity.isSelected()) {
+                for (int i = 0; i < orderList.size(); i++) {
+                    if (orderList.get(i).getCity().equalsIgnoreCase(txtSearch.getText())) {
+                        searchSub = i;
+                    }
+                }
+            }
+            
+            showData(searchSub);
         }
     }
 
